@@ -23,7 +23,7 @@ counter = 1;
 for i = 1:(length(COP_dat.RForce)-1)
     if COP_dat.RForce(i) == 0 && COP_dat.RForce(i+1) > COP_dat.RForce(i) + 75
        R_steps(counter) = i;
-       counter = counter +1
+       counter = counter + 1;
     end
 end
 R_steps = R_steps(R_steps~=0);
@@ -33,7 +33,7 @@ counter = 1;
 for i = 1:(length(COP_dat.RForce)-1)
     if COP_dat.RForce(i) ~= 0 && COP_dat.RForce(i+1) == 0
        R_ends(counter) = i;
-       counter = counter +1
+       counter = counter + 1;
     end
 end
 R_ends = R_ends(R_ends~=0); R_ends = R_ends(R_ends > 10); %Remove falsely preallocated 0s and false early steps due to NAs
@@ -44,7 +44,7 @@ counter = 1;
 for i = 1:(length(COP_dat.LForce)-1)
     if COP_dat.LForce(i) == 0 && COP_dat.LForce(i+1) > 75
        L_steps(counter) = i;
-       counter = counter +1
+       counter = counter + 1;
     end
 end
 L_steps = L_steps(L_steps~=0);
@@ -54,7 +54,7 @@ counter = 1;
 for i = 1:(length(COP_dat.LForce)-1)
     if COP_dat.LForce(i) ~= 0 && COP_dat.LForce(i+1) == 0
        L_ends(counter) = i;
-       counter = counter +1
+       counter = counter + 1;
     end
 end
 L_ends = L_ends(L_ends~=0); L_ends = L_ends(L_ends > 10); %Remove falsely preallocated 0s and false early steps due to NAs
@@ -100,8 +100,14 @@ end
 
 [pksR,locsL] = findpeaks(-1 * COP_dat.RCOPx); % find peaks but need to multiply by -1 to get the medial peak
 pksR = pksR(pksR ~=0); pksR = -1 * pksR; %Remove false 0 peaks and return back to the correct sign
+figure(7)
 findpeaks(-1 * COP_dat.RCOPx) 
+print('Remove the false peaks from figures 7 and 8')
 
 [pksL,locsL] = findpeaks(-1 * COP_dat.LCOPx);
 pksL = pksL(pksL ~=0); pksL = -1 * pksL;
+figure(8)
 findpeaks(-1 * COP_dat.LCOPx)
+
+L_med_peak = mean(pksL)
+R_med_peak = mean(pksR)
