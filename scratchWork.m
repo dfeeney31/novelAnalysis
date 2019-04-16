@@ -4,18 +4,18 @@ clear
 COP_dat = importfile('Feeney_Dan_3.fgt');
 
 %This is just a test to look at COP values during one step L/R
-figure(1)
-plot(COP_dat.LCOPx(432:455), COP_dat.LCOPy(432:455))
-hold on
-plot(COP_dat.RCOPx(466:491), COP_dat.RCOPy(466:491))
-legend('Left', 'Right')
-
-%Test to look at Force values during one step L/R
-figure(2)
-plot(COP_dat.LForce(432:455))
-hold on
-plot(COP_dat.RForce(466:491))
-legend('Left', 'Right')
+% figure(1)
+% plot(COP_dat.LCOPx(432:455), COP_dat.LCOPy(432:455))
+% hold on
+% plot(COP_dat.RCOPx(466:491), COP_dat.RCOPy(466:491))
+% legend('Left', 'Right')
+% 
+% %Test to look at Force values during one step L/R
+% figure(2)
+% plot(COP_dat.LForce(432:455))
+% hold on
+% plot(COP_dat.RForce(466:491))
+% legend('Left', 'Right')
 
 %% Find the start of each step
 R_steps = zeros(1,20);
