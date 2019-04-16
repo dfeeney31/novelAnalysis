@@ -102,12 +102,15 @@ end
 pksR = pksR(pksR ~=0); pksR = -1 * pksR; %Remove false 0 peaks and return back to the correct sign
 figure(7)
 findpeaks(-1 * COP_dat.RCOPx) 
-print('Remove the false peaks from figures 7 and 8')
+falsePeakValR = input('Input the value to remove false peaks: ')
+pksR = pksR(pksR < falsePeakValR);
 
 [pksL,locsL] = findpeaks(-1 * COP_dat.LCOPx);
 pksL = pksL(pksL ~=0); pksL = -1 * pksL;
 figure(8)
 findpeaks(-1 * COP_dat.LCOPx)
+falsePeakValL = input('Input the value to remove false peaks: ')
+pksL = pksL(pksL < falsePeakValL);
 
 L_med_peak = mean(pksL)
 R_med_peak = mean(pksR)
