@@ -66,18 +66,24 @@ for file = files'
     %Calcualte the peaks for M-L trajectory
     [pksR,locsL] = findpeaks(-1 * COP_dat.RCOPx); % find peaks but need to multiply by -1 to get the medial peak
     pksR = pksR(pksR ~=0); pksR = -1 * pksR; %Remove false 0 peaks and return back to the correct sign
-    figure(1)
-    findpeaks(-1 * COP_dat.RCOPx)
-    falsePeakValR = 50; falsePeakValRLow = 30;
-    pksR = pksR(pksR < falsePeakValRHigh && pksR > falsePeakValRLow);
+    falsePeakValRHigh = 50; falsePeakValRLow = 30;
+    pksR = pksR(pksR < falsePeakValRHigh);
+    pksR = pksR(pksR > falsePeakValRLow);
     
+    %Calculate the lateral peaks
+    [LpksR,locsL] = findpeaks(COP_dat.RCOPx);
+    LpksR = LpksR(LpksR > 50);
+    
+    % Left side
     [pksL,locsL] = findpeaks(-1 * COP_dat.LCOPx);
     pksL = pksL(pksL ~=0); pksL = -1 * pksL;
-    figure(2)
-    findpeaks(-1 * COP_dat.LCOPx)
     falsePeakValLHigh = 50; falsePeakValLow = 30; 
-    pksL = pksL(pksL < falsePeakValLHigh && pksL > falsePeakValLow);
+    pksL = pksL(pksL < falsePeakValLHigh);
+    pksL = pksL(pksL > falsePeakValLow);
     
+    %Calculate the lateral peaks
+    [LpksL,locsL] = findpeaks(COP_dat.LCOPx);
+    LpksL = LpksL(LpksL > 50);
     
     %%%%%% Save the data of interest into a cell array
     longdata.name{counter_outside} = file.name;
@@ -87,8 +93,10 @@ for file = files'
     longdata.COPxR{counter_outside} = COPx_stackedR;
     longdata.ForceR{counter_outside} = ForceR_stacked;
     longdata.ForceL{counter_outside} = ForceL_stacked;
-    longdata.LMedPeak = mean(pksL);
-    longdata.RMedPeak = mean(pksR);
+    longdata.LMedPeak{counter_outside} = mean(pksL);
+    longdata.RMedPeak{counter_outside} = mean(pksR);
+    longdata.LLatPeak{counter_outside} = mean(LpksL);
+    longdata.RLatPeak{counter_outside} = mean(LpksR);
     
     counter_outside = counter_outside + 1;
 end
