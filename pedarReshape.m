@@ -1,11 +1,13 @@
 function reshapedArray = pedarReshape(array,index)
 %pedarReshape reshaped 99 sensors to a 15 x 7 matrix w/ padding
 %   Detailed explanation goes here
+
+    %Fixed below
     reshapedDat = zeros(1,105);
-    reshapedDat(2:6) = array(index,1:5);
-    reshapedDat(8:97) = array(index,6:95);
-    reshapedDat(100:103) = array(index,96:99);
+    reshapedDat(3:6) = array(index,99:-1:96);
+    reshapedDat(9:98) = array(index,95:-1:6);
+    reshapedDat(100:104) = array(index,5:-1:1);
     reshapedArray = reshape(reshapedDat,15,7);
+    reshapedArray = reshapedArray';
     
 end
-

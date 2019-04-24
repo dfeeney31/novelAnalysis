@@ -3,10 +3,15 @@
 
 dat = MazzioJon1;
 % start at frame 204
-
-for frame = 204:220
+plot(dat(:,2))
+for frame = 490:510
     resDat = pedarReshape(dat, frame);
     figure
     contourf(resDat);
 end
 
+pedarReshape(dat, 510)
+contourf(ans)
+dat(510,96)
+
+% current reshaping is going down the columns then rows. Need to do r,c
