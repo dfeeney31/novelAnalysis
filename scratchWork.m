@@ -1,6 +1,7 @@
 %%%%%%% Import novel with custom function importfile.m from the novel
 %%%%%%% analysis directory.
 clear
+addpath('C:\Users\Daniel.Feeney\Documents\novel_data')  
 COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Trail Run Internal Pilot\PedarFiles\TimeSeriesData\BobbyXNB.fgt');
 
 %This is just a test to look at COP values during one step L/R
