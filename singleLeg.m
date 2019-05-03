@@ -28,9 +28,9 @@ disp('Select just before landing and near the end of the trial for non laced')
 %Plot center of pressure during landing and stabilization for both
 %conditions
 figure
-plot(Boa_landing.RCOPx(floor(locs_boa(1)):floor(locs_boa(2))), Boa_landing.RCOPy(floor(locs_boa(1)):floor(locs_boa(2))))
+plot(Boa_landing.RCOPx(floor(locs_boa(1)):floor(locs_boa(1)+100)), Boa_landing.RCOPy(floor(locs_boa(1)):floor(locs_boa(1)+100)))
 hold on
-plot(NL_landing.RCOPx(floor(locs_NL(1)):floor(locs_NL(2))), NL_landing.RCOPy(floor(locs_NL(1)):floor(locs_NL(2))))
+plot(NL_landing.RCOPx(floor(locs_NL(1)):floor(locs_NL(1)+100)), NL_landing.RCOPy(floor(locs_NL(1)):floor(locs_NL(1)+100)))
 legend('Boa','Non laced')
 
 %calculate a point with relatively high confidence where landing has begun
