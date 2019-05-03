@@ -3,20 +3,32 @@
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')  
 COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Trail Run Internal Pilot\PedarFiles\TimeSeriesData\BobbyXNB.fgt');
+COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Boa Team Folder\PilotNovelData\HopBoa.fgt');
 
 %This is just a test to look at COP values during one step L/R
-% figure(1)
-% plot(COP_dat.LCOPx(432:455), COP_dat.LCOPy(432:455))
-% hold on
-% plot(COP_dat.RCOPx(466:491), COP_dat.RCOPy(466:491))
-% legend('Left', 'Right')
-% 
-% %Test to look at Force values during one step L/R
-% figure(2)
-% plot(COP_dat.LForce(432:455))
-% hold on
-% plot(COP_dat.RForce(466:491))
-% legend('Left', 'Right')
+figure(1)
+plot(COP_dat.LCOPx(350:405), COP_dat.LCOPy(350:405))
+hold on
+plot(COP_dat.RCOPx(450:550), COP_dat.RCOPy(450:550))
+legend('Left', 'Right')
+
+%Test to look at Force values during one step L/R
+figure(2)
+plot(COP_dat.LForce)
+hold on
+plot(COP_dat.RForce)
+legend('Left', 'Right')
+
+figure
+plot(COP_dat.RForce(430:end))
+
+SD_vec = zeros(1,70);
+for i = 430:1:500
+   win =  COP_dat.RForce(i:i+50);
+   SD_vec(i) = std(win);
+end
+figure 
+plot(SD_vec)
 
 %% Find the start of each step
 R_steps = zeros(1,20);
