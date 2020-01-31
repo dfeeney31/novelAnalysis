@@ -2,9 +2,14 @@
 %%%%%%%%%%%% Takes fgt files in alphabetical order 
 
 clear
+%cd 'C:\Users\Daniel.Feeney\Dropbox (Boa)\SensoriaFolder\StretchTesting'
+cd 'C:\Users\Daniel.Feeney\Dropbox (Boa)\AgilityPerformance\AsicsTennis\SkaterFGT'
 files = dir('*.fgt');
 longdata = struct();
 
+addpath('C:\Users\Daniel.Feeney\Documents\novel_data') 
+
+step_size = 60;
 counter_outside = 1;
 for file = files'
    COP_dat = importfile(file.name);
@@ -15,7 +20,7 @@ for file = files'
     R_steps = zeros(1,20);
     counter = 1;
     for i = 1:(length(COP_dat.RForce)-1)
-        if (COP_dat.RForce(i) < 60) && (COP_dat.RForce(i+1) > 100)
+        if (COP_dat.RForce(i) < 60) && (COP_dat.RForce(i+1) > 90)
             R_steps(counter) = i;
             counter = counter + 1;
         end
@@ -34,29 +39,30 @@ for file = files'
     L_steps = L_steps(L_steps~=0);
     
     %%%%% Stack the values into matrix for storing %%%%
+    
     R_stepsCOP = R_steps +1; %increment by 1 index to avoid the 0,0 being plotted
-    ForceR_stacked = zeros(22,21);
-    COPy_stackedR = zeros(22, 21);
-    COPx_stackedR = zeros(22, 21);
+    ForceR_stacked = zeros(length(R_steps),step_size+1);
+    COPy_stackedR = zeros(length(R_steps), step_size+1);
+    COPx_stackedR = zeros(length(R_steps), step_size+1);
     for step = 1:(length(R_steps) - 1)
-        COPy_stackedR(step,:) = COP_dat.RCOPy(R_stepsCOP(step):R_stepsCOP(step)+20);
-        COPx_stackedR(step,:) = COP_dat.RCOPx(R_stepsCOP(step):R_stepsCOP(step)+20);
-        ForceR_stacked(step,:) = COP_dat.RForce(R_steps(step):R_steps(step)+20);
+        COPy_stackedR(step,:) = COP_dat.RCOPy(R_stepsCOP(step):R_stepsCOP(step)+step_size);
+        COPx_stackedR(step,:) = COP_dat.RCOPx(R_stepsCOP(step):R_stepsCOP(step)+step_size);
+        ForceR_stacked(step,:) = COP_dat.RForce(R_steps(step):R_steps(step)+step_size);
     end
     COPy_stackedR = COPy_stackedR(~any(COPy_stackedR == 0,2),:);
     COPx_stackedR = COPx_stackedR(~any(COPx_stackedR == 0,2),:);
     
     % Stack the values for left insole
     L_stepsCOP = L_steps + 1; %increment by 1 index to avoid the 0,0 being plotted
-    COPy_stackedL = zeros(length(L_steps), 21);
-    COPx_stackedL = zeros(length(L_steps), 21);
+    COPy_stackedL = zeros(length(L_steps), step_size+1);
+    COPx_stackedL = zeros(length(L_steps), step_size+1);
     for step = 1:(length(L_steps)-1)
-        if ~any(COP_dat.LCOPy(L_stepsCOP(step):L_stepsCOP(step)+20))
+        if ~any(COP_dat.LCOPy(L_stepsCOP(step):L_stepsCOP(step)+step_size))
             pass
         else
-            COPy_stackedL(step,:) = COP_dat.LCOPy(L_stepsCOP(step):L_stepsCOP(step)+20);
-            COPx_stackedL(step,:) = COP_dat.LCOPx(L_stepsCOP(step):L_stepsCOP(step)+20);
-            ForceL_stacked(step,:) = COP_dat.LForce(L_steps(step):L_steps(step)+20);
+            COPy_stackedL(step,:) = COP_dat.LCOPy(L_stepsCOP(step):L_stepsCOP(step)+step_size);
+            COPx_stackedL(step,:) = COP_dat.LCOPx(L_stepsCOP(step):L_stepsCOP(step)+step_size);
+            ForceL_stacked(step,:) = COP_dat.LForce(L_steps(step):L_steps(step)+step_size);
         end
     end
     

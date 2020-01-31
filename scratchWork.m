@@ -2,12 +2,15 @@
 %%%%%%% analysis directory.
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')  
-COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Trail Run Internal Pilot\PedarFiles\TimeSeriesData\BobbyXNB.fgt');
-COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Boa Team Folder\PilotNovelData\HopBoa.fgt');
+COP_dat = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Snow Protocol\Protocol_Data\BV_Groomer_1.fgt');
+COP_dat2 = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Snow Protocol\Protocol_Data\BV_Groomer_2.fgt');
+COP_dat3 = importfile('C:\Users\Daniel.Feeney\Dropbox (Boa)\Snow Protocol\Protocol_Data\BV_Groomer_3.fgt');
+
+dat = importRawMat('C:\Users\Daniel.Feeney\Dropbox (Boa)\Snow Protocol\Protocol_Data\BV_Groomer_1.asc');
 
 %This is just a test to look at COP values during one step L/R
 figure(1)
-plot(COP_dat.LCOPx(350:405), COP_dat.LCOPy(350:405))
+plot(COP_dat.LCOPx, COP_dat.LCOPy)
 hold on
 plot(COP_dat.RCOPx(450:550), COP_dat.RCOPy(450:550))
 legend('Left', 'Right')
@@ -16,8 +19,17 @@ legend('Left', 'Right')
 figure(2)
 plot(COP_dat.LForce)
 hold on
+plot(COP_dat2.LForce)
+plot(COP_dat3.LForce)
+legend('Trial 1', 'Trial 2', 'Trial 3')
+
+
+figure(3)
 plot(COP_dat.RForce)
-legend('Left', 'Right')
+hold on
+plot(COP_dat2.RForce)
+plot(COP_dat3.RForce)
+legend('Trial 1', 'Trial 2', 'Trial 3')
 
 figure
 plot(COP_dat.RForce(430:end))
