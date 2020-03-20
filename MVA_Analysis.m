@@ -21,8 +21,7 @@ minStepLen = 20; %minimal step length
 
 for s = 1:NumbFiles
     close all
-    % all within loop
-    %dat = importMVA('C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\Data\NovelData\BV_DD_long_2.mva');
+    clearvars stepLengths2 takeoffsR landings falseSteps2 stepLengths takeoffs landingsR
     
     %extract file metadata
     fileName = dataList{f(s)};
