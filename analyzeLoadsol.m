@@ -2,7 +2,9 @@
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')
 % The files should be named sub_balance_Config_trialNo - Forces.txt
-input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
+%input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
+input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
+
 
 cd(input_dir)
 files = dir('*.txt');
@@ -18,6 +20,7 @@ outputAllConfigs = {'Config','TrialNo','Side','PrePost','stanceTime','PkTotal', 
 fThresh = 50; %below this value will be set to 0.
 minStepLen = 10; %minimal step length
 writeData = 1; %will write to spreadsheet
+desiredStepLength = 20; %length to look forward after initial contact
 
 for s = 1:NumbFiles
     %% loop
@@ -81,10 +84,10 @@ for s = 1:NumbFiles
     LMed = zeros(length(lic),21);
     
     for i = 1:(length(lic) - 1)
-        LTot(i,:) = LForce(lic(i):lic(i)+20);
-        LHeel(i,:) = dat.LeftHeel(lic(i):lic(i)+20);
-        LLat(i,:) = dat.LeftLateral(lic(i):lic(i)+20);
-        LMed(i,:) = dat.LeftMedial(lic(i):lic(i)+20);
+        LTot(i,:) = LForce(lic(i):lic(i)+desiredStepLength);
+        LHeel(i,:) = dat.LeftHeel(lic(i):lic(i)+desiredStepLength);
+        LLat(i,:) = dat.LeftLateral(lic(i):lic(i)+desiredStepLength);
+        LMed(i,:) = dat.LeftMedial(lic(i):lic(i)+desiredStepLength);
     end
     %% right side
     RForce = dat.Right; RForce(RForce<fThresh) = 0;
@@ -138,10 +141,10 @@ for s = 1:NumbFiles
     RMed = zeros(length(ric),21);
     
     for i = 1:(length(ric) - 1)
-        RTot(i,:) = RForce(ric(i):ric(i)+20);
-        RHeel(i,:) = dat.RightHeel(ric(i):ric(i)+20);
-        RLat(i,:) = dat.RightLateral(ric(i):ric(i)+20);
-        RMed(i,:) = dat.RightMedial(ric(i):ric(i)+20);
+        RTot(i,:) = RForce(ric(i):ric(i)+desiredStepLength);
+        RHeel(i,:) = dat.RightHeel(ric(i):ric(i)+desiredStepLength);
+        RLat(i,:) = dat.RightLateral(ric(i):ric(i)+desiredStepLength);
+        RMed(i,:) = dat.RightMedial(ric(i):ric(i)+desiredStepLength);
     end
     %% extract features from each step
     %left preallocation
@@ -177,6 +180,7 @@ for s = 1:NumbFiles
         tmpFR = RTot(step,:);
         stanceTimeR(step) = length(tmpFR(tmpFR>0));
     end
+    
     %concatenate left features and remove 0 rows
     leftFeat = [stanceTime; pkTot; totImpulse; pkHeel; heelImpulse; pkLat; latImpulse; pkMed; medImpulse; rateTot]';
     leftFeat = leftFeat(any(leftFeat,2),:); %removing row with all 0s
@@ -221,25 +225,25 @@ end
 % 
 % %% make plots 
 % figure(3)
-% shadedErrorBar(0:20, LTot, {@mean, @std}, 'lineprops','blue');
+% shadedErrorBar(0:desiredStepLength, LTot, {@mean, @std}, 'lineprops','blue');
 % hold on
-% shadedErrorBar(0:20, RTot, {@mean, @std}, 'lineprops','red');
+% shadedErrorBar(0:desiredStepLength, RTot, {@mean, @std}, 'lineprops','red');
 % title('Total Force')
 % 
 % figure(5)
-% shadedErrorBar(0:20, LHeel, {@mean, @std},'lineprops', 'blue')
+% shadedErrorBar(0:desiredStepLength, LHeel, {@mean, @std},'lineprops', 'blue')
 % hold on
-% shadedErrorBar(0:20, RHeel, {@mean, @std},'lineprops', 'red')
+% shadedErrorBar(0:desiredStepLength, RHeel, {@mean, @std},'lineprops', 'red')
 % title('left (blue) vs. right (red) heel')
 % 
 % figure(6)
-% shadedErrorBar(0:20, LMed, {@mean, @std},'lineprops', 'blue')
+% shadedErrorBar(0:desiredStepLength, LMed, {@mean, @std},'lineprops', 'blue')
 % hold on
-% shadedErrorBar(0:20, RMed, {@mean, @std},'lineprops', 'red')
+% shadedErrorBar(0:desiredStepLength, RMed, {@mean, @std},'lineprops', 'red')
 % title('left (blue) vs. right (red) medial forefoot')
 % 
 % figure(7)
-% shadedErrorBar(0:20, LLat, {@mean, @std},'lineprops', 'blue')
+% shadedErrorBar(0:desiredStepLength, LLat, {@mean, @std},'lineprops', 'blue')
 % hold on
-% shadedErrorBar(0:20, RLat, {@mean, @std},'lineprops', 'red')
+% shadedErrorBar(0:desiredStepLength, RLat, {@mean, @std},'lineprops', 'red')
 % title('left (blue) vs. right (red) lateral forefoot')

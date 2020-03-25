@@ -14,14 +14,14 @@ dataList = sort(dataList);
 [f,~] = listdlg('PromptString','Select data files for all subjects in group','SelectionMode','multiple','ListString',dataList);
 NumbFiles = length(f);
 
-outputAllConfigs = {'SubName','Config','TrialNo','StepNo','force', 'pressure', 'meanPressure', 'FTI'};
+outputAllConfigs = {'SubName','Config','TrialNo','StepNo','force', 'pressure', 'meanPressure', 'FTI','StanceTime'};
 %% Set constants
-forceThresh = 150; %Force threshold
+forceThresh = 180; %Force threshold
 minStepLen = 20; %minimal step length
 
 for s = 1:NumbFiles
     close all
-    clearvars stepLengths2 takeoffsR landings falseSteps2 stepLengths takeoffs landingsR
+    clearvars stepLengths2 takeoffsR landings falseSteps2 stepLengths takeoffs landingsR falseSteps
     
     %extract file metadata
     fileName = dataList{f(s)};
@@ -39,7 +39,7 @@ for s = 1:NumbFiles
     % Trim the trial to be after the three stomps
     plot(dat.forceN1)
     disp('Select start and end of trial')
-    [pos locs] = ginput(2)
+    [pos, locs] = ginput(2);
     pos(1) = floor(pos(1)); pos(2) = floor(pos(2));
     % new variables
     Lforce = dat.forceN(pos(1):pos(2)); Rforce = dat.forceN1(pos(1):pos(2));
@@ -51,7 +51,7 @@ for s = 1:NumbFiles
     counter = 1;
     for ind = 1:length(Lforce)-1
         
-        if Lforce(ind) == 0 & Lforce(ind + 1) > 0
+        if Lforce(ind) == 0 && Lforce(ind + 1) > 0
             landings(counter) = ind;
             counter = counter + 1;
         end
@@ -61,7 +61,7 @@ for s = 1:NumbFiles
     takeoffs = zeros(1,20);
     counter = 1;
     for ind = 1:length(Lforce)-1
-        if Lforce(ind) > 0 & Lforce(ind + 1) == 0
+        if Lforce(ind) > 0 && Lforce(ind + 1) == 0
             takeoffs(counter) = ind + 1;
             counter = counter + 1;
         end
@@ -84,22 +84,13 @@ for s = 1:NumbFiles
     falseSteps = find(stepLengths < minStepLen);
     landings(falseSteps) = []; takeoffs(falseSteps) = []; stepLengths(falseSteps) = [];
     
-    % look at left steps
-%     fig=figure;
-%     hax=axes;
-%     plot(Lforce)
-%     hold on
-%     for i = 1:length(landings)
-%         line([landings(i) landings(i)],get(hax,'YLim'),'Color','red')
-%         line([takeoffs(i) takeoffs(i)],get(hax,'YLim'),'Color','blue')
-%     end
     
     % Right side
     landingsR = zeros(1,20);
     counter = 1;
     for ind = 1:length(Rforce)-1
         
-        if Rforce(ind) == 0 & Rforce(ind + 1) > 0
+        if Rforce(ind) == 0 && Rforce(ind + 1) > forceThresh
             landingsR(counter) = ind;
             counter = counter + 1;
         end
@@ -110,13 +101,13 @@ for s = 1:NumbFiles
     counter = 1;
     for ind = 1:length(Rforce)-1
         
-        if Rforce(ind) > 0 & Rforce(ind + 1) == 0
+        if Rforce(ind) > forceThresh && Rforce(ind + 1) == 0
             takeoffsR(counter) = ind + 1;
             counter = counter + 1;
         end
-        
-        
+
     end
+    
     % Trimming the first and last index if recording began with a takeoff or
     % landing
     if landingsR(1) > takeoffsR(1)
@@ -125,14 +116,15 @@ for s = 1:NumbFiles
     end
     
     % check for equal lengths and trim if not equal
-    if ~ (length(landingsR) == length(takeoffsR))
-        if landingsR(end) < takeoffsR(end)
+    while ~ (length(landingsR) == length(takeoffsR))
+        if landingsR(end) > takeoffsR(end)
             takeoffsR(end) = [];
         end
         if takeoffsR(1) < landingsR(1)
             takeoffsR(1) = [];
         end
     end
+    
     % Cleaning false steps on the right size with minStepLen
     stepLengths2 = takeoffsR - landingsR;
     falseSteps2 = find(stepLengths2 < minStepLen);
@@ -146,16 +138,20 @@ for s = 1:NumbFiles
     FTI = zeros(1,length(takeoffs));
     
     % loop through and extract
-    for step = 1:length(landings)
+    for step = 1:(length(landings) - 1)
         try
             tmp_stepF = Lforce(landings(step):takeoffs(step));
             tmp_stepP = LMaxpressure(landings(step):takeoffs(step));
             tmp_stepmP = LMeanpressure(landings(step):takeoffs(step));
-            
             [maxF(step), maxInd] = max(tmp_stepF);
             FTI(step) = sum(tmp_stepF);
             maxP(step) = max(tmp_stepP);
             meanP(step) = tmp_stepmP(maxInd);
+        catch
+            maxF(step) = 0;
+            FTI(step) = 0;
+            maxP(step) = 0;
+            meanP(step) = 0;
         end
         
     end
@@ -170,7 +166,7 @@ for s = 1:NumbFiles
     FTIR = zeros(1,length(takeoffsR));
     
     % loop through and extract
-    for step = 1:length(landingsR)
+    for step = 1:(length(landingsR) - 1)
         tmp_stepF = Rforce(landingsR(step):takeoffsR(step));
         tmp_stepP = RMaxpressure(landingsR(step):takeoffsR(step));
         tmp_stepmP = RMeanpressure(landingsR(step):takeoffsR(step));
@@ -203,6 +199,7 @@ for s = 1:NumbFiles
     pressureLong = zeros(50,1);
     meanPressureLong = zeros(50,1);
     FTIlong = zeros(50,1);
+    stanceLong = zeros(50,1);
     
     count = 1;
     for i = 1:2:(length(maxF) * 2)
@@ -214,13 +211,15 @@ for s = 1:NumbFiles
         meanPressureLong(i+1) = meanPR(count);
         FTIlong(i) = FTI(count);
         FTIlong(i+1) = FTIR(count);
+        stanceLong(i) = stepLengths(count);
+        stanceLong(i+1) = stepLengths2(count);
         
         count = count + 1;
     end
     
     %filter out 0 values from preallocation, reshape to correct size
-    kinData = [forceLong, pressureLong, meanPressureLong, FTIlong];
-    kinData(kinData == 0) = []; kinData = reshape(kinData, [length(kinData)/4, 4])
+    kinData = [forceLong, pressureLong, meanPressureLong, FTIlong, stanceLong];
+    kinData = kinData(any(kinData,2),:);
     
     % metadata
     subNameTmp = cell(length(kinData),1); configNameTmp = cell(length(kinData),1); upDownTmp = cell(length(kinData),1);
@@ -239,7 +238,8 @@ for s = 1:NumbFiles
     if s == length(NumbFiles)
         close all
     end
+    
 end
 %convert to table
-T = cell2table(outputAllConfigs(2:end,:),'VariableNames',outputAllConfigs(1,:))
-writetable(T,'DFhikeLong.csv')
+T = cell2table(outputAllConfigs(2:end,:),'VariableNames',outputAllConfigs(1,:));
+writetable(T,'BVhike1.csv')
