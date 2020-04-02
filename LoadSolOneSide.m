@@ -2,9 +2,8 @@
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')
 % The files should be named sub_balance_Config_trialNo - Forces.txt
-%input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
-input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
-
+input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
+%input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
 
 cd(input_dir)
 files = dir('*.txt');
@@ -18,15 +17,25 @@ outputAllConfigs = {'Subject','Config','UpDown','PrePost','stanceTime','PkTotal'
 
 %Define constants and options
 fThresh = 50; %below this value will be set to 0.
-minStepLen = 20; %minimal step length
+minStepLen = 10; %minimal step length
 writeData = 1; %will write to spreadsheet
 desiredStepLength = 70; %length to look forward for plotting and data gathering 
+tFirstImpact = 20; %Calculating loading rate. How far do you look for impact peak? 
+apple = 0;
 
 for s = 1:NumbFiles
     %% loop
     fileName = dataList{f(s)};
     fileLoc = [input_dir '\' fileName];
-    dat = importDualBelt(fileLoc);
+    if apple == 1
+        dat = importLoadsol(fileLoc);
+        dat.Properties.VariableNames = {'Time' 'RightLateral' 'RightMedial' 'RightHeel','Right','pass','pass1','pass2','pass3','pass4','toBePassed'};
+
+    else
+        dat = importLoadsolAndroid(fileLoc);
+        dat.Properties.VariableNames = {'Time' 'LeftHeel' 'LeftMedial' 'LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right',...
+            'toBePassed', 'pass2','pass3','pass4','pass5'};
+    end
     
     splitFName = strsplit(fileName,'_'); 
     TimePointTmp = strsplit(splitFName{4},'.');
@@ -35,8 +44,6 @@ for s = 1:NumbFiles
     UpDown = splitFName{3};
     TimePoint = TimePointTmp{1};
     
-    dat = importLoadsol(fileLoc);
-    dat.Properties.VariableNames = {'Time' 'RightLateral' 'RightMedial' 'RightHeel','Right','pass','pass1','pass2','pass3','pass4','toBePassed'};
     dat = dat(:,1:5);
 
     %% right side
@@ -106,7 +113,7 @@ for s = 1:NumbFiles
     
     for step = 1:length(ric)
         %right
-        [pkTotR(step), Ir(step)]= max(RTot(step,:)); totImpulseR(step) = sum(RTot(step,:));
+        [pkTotR(step), Ir(step)]= max(RTot(step,1:tFirstImpact)); totImpulseR(step) = sum(RTot(step,:));
         pkHeelR(step) = max(RHeel(step,:)); heelImpulseR(step) = sum(RHeel(step,:));
         pkLatR(step) = max(RLat(step,:)); latImpulseR(step) = sum(RLat(step,:));
         pkMedR(step) = max(RMed(step,:)); medImpulseR(step) = sum(RMed(step,:));
@@ -148,7 +155,7 @@ if writeData == 1
     % Convert cell to a table and use first row as variable names
     T = cell2table(outputAllConfigs(2:end,:),'VariableNames',outputAllConfigs(1,:));
     % Write the table to a CSV file
-    writetable(T,'DFtest.csv')
+    writetable(T,'DFfour.csv')
 end
 % 
 %% make plots 

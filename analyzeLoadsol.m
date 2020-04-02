@@ -2,8 +2,8 @@
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')
 % The files should be named sub_balance_Config_trialNo - Forces.txt
-%input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
-input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
+input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\KH';% Change to correct filepath
+%input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
 
 
 cd(input_dir)
@@ -21,20 +21,29 @@ fThresh = 50; %below this value will be set to 0.
 minStepLen = 10; %minimal step length
 writeData = 1; %will write to spreadsheet
 desiredStepLength = 20; %length to look forward after initial contact
+apple = 0; %1 for apple 2 for Android
 
 for s = 1:NumbFiles
     %% loop
     fileName = dataList{f(s)};
     fileLoc = [input_dir '\' fileName];
-    dat = importDualBelt(fileLoc);
-    
-    splitFName = strsplit(fileName,'_'); configName = splitFName{1};
-    trialNo = splitFName{3}(1); PrePost = splitFName{2};
-    
-    
-    dat = importLoadsol(fileLoc);
-    dat.Properties.VariableNames = {'Time' 'LeftHeel' 'LeftMedial' 'LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right','toBePassed'};
+   
+    if apple == 1
+        dat = importLoadsol(fileLoc);
+        dat.Properties.VariableNames = {'Time' 'LeftHeel' 'LeftMedial' 'LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right','toBePassed'};
+
+    else
+        dat = importLoadsolAndroid(fileLoc);
+        dat.Properties.VariableNames = {'Time' 'LeftHeel' 'LeftMedial' 'LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right',...
+            'toBePassed', 'pass2','pass3','pass4','pass5'};
+
+    end
+
     dat = dat(:,1:10);
+    
+    splitFName = strsplit(fileName,'_'); configName = splitFName{2};
+    trialNo = splitFName{4}(1); PrePost = splitFName{3};
+    
     %% left side
     LForce = dat.Left; LForce(LForce<fThresh) = 0;
     
@@ -42,7 +51,7 @@ for s = 1:NumbFiles
     lic = zeros(15,1);
     count = 1;
     for step = 1:length(LForce)-1
-        if (LForce(step) == 0 && LForce(step + 1) > fThresh)
+        if (LForce(step) == 0 && LForce(step + 1) >= fThresh)
             lic(count) = step;
             count = count + 1;
         end
@@ -51,7 +60,7 @@ for s = 1:NumbFiles
     lto = zeros(15,1);
     count = 1;
     for step = 1:length(LForce)-1
-        if (LForce(step) > fThresh && LForce(step + 1) == 0)
+        if (LForce(step) >= fThresh && LForce(step + 1) == 0)
             lto(count) = step + 1;
             count = count + 1;
         end
@@ -65,7 +74,7 @@ for s = 1:NumbFiles
     if (lic(end) > lto(end))
         lic(end) = [];
     end
-    
+
     % Calculate step lengths, remove steps that were too short and first
     % three and last 2 steps
     LStepLens = lto - lic;
@@ -96,7 +105,7 @@ for s = 1:NumbFiles
     ric = zeros(15,1);
     count = 1;
     for step = 1:length(RForce)-1
-        if (RForce(step) == 0 && RForce(step + 1) > fThresh)
+        if (RForce(step) == 0 && RForce(step + 1) >= fThresh)
             ric(count) = step;
             count = count + 1;
         end
@@ -105,7 +114,7 @@ for s = 1:NumbFiles
     rto = zeros(15,1);
     count = 1;
     for step = 1:length(RForce)-1
-        if (RForce(step) > fThresh && RForce(step + 1) == 0)
+        if (RForce(step) >= fThresh && RForce(step + 1) == 0)
             rto(count) = step + 1;
             count = count + 1;
         end
@@ -184,17 +193,24 @@ for s = 1:NumbFiles
     %concatenate left features and remove 0 rows
     leftFeat = [stanceTime; pkTot; totImpulse; pkHeel; heelImpulse; pkLat; latImpulse; pkMed; medImpulse; rateTot]';
     leftFeat = leftFeat(any(leftFeat,2),:); %removing row with all 0s
-    lVecTmp = cell(length(leftFeat),1);
-    for l = 1:length(leftFeat)
-       lVecTmp(l) = {'l'}; 
-    end
+
     %concatenate right features and remove 0 rows
     rightFeat = [stanceTimeR; pkTotR; totImpulseR; pkHeelR; heelImpulseR; pkLatR; latImpulseR; pkMedR; medImpulseR; rateTotR]';
     rightFeat = rightFeat(any(rightFeat,2),:); %removing row with all 0s
-    rVecTmp = cell(length(rightFeat),1);
-    for l = 1:length(rightFeat)
+
+    %%%%%%%%%
+    kinData = [leftFeat; rightFeat];
+    %
+    rVecTmp = cell(size(rightFeat,1),1);
+    for l = 1:length(rVecTmp)
        rVecTmp(l) = {'r'}; 
     end
+    
+    lVecTmp = cell(size(leftFeat,1),1);
+    for l = 1:length(lVecTmp)
+       lVecTmp(l) = {'l'}; 
+    end
+    %%%%%%%%%%%%%
    %make vectors of left or right and configuration name to add into file
     LRtmp = vertcat(lVecTmp, rVecTmp); %left or right side into a vector
     configNameTmp = cell(length(LRtmp),1); %configuration name from early in the file
