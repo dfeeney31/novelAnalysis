@@ -19,9 +19,9 @@ outputAllConfigs = {'Config','TrialNo','Side','PrePost','stanceTime','PkTotal', 
 %Define constants and options
 fThresh = 50; %below this value will be set to 0.
 minStepLen = 10; %minimal step length
-writeData = 1; %will write to spreadsheet
+writeData = 1; %will write to spreadsheet if 1 entered
 desiredStepLength = 20; %length to look forward after initial contact
-apple = 0; %1 for apple 2 for Android
+apple = 0; %1 for apple 0 otherwise
 
 for s = 1:NumbFiles
     %% loop
@@ -180,14 +180,17 @@ for s = 1:NumbFiles
         rateTot(step) = pkTot(step) / (I(step)/100);
         tmpF = LTot(step,:);
         stanceTime(step) = length(tmpF(tmpF>0));
+    end
+    
+    for stepR = 1:length(ric)
         %right
-        [pkTotR(step), Ir(step)]= max(RTot(step,:)); totImpulseR(step) = sum(RTot(step,:));
-        pkHeelR(step) = max(RHeel(step,:)); heelImpulseR(step) = sum(RHeel(step,:));
-        pkLatR(step) = max(RLat(step,:)); latImpulseR(step) = sum(RLat(step,:));
-        pkMedR(step) = max(RMed(step,:)); medImpulseR(step) = sum(RMed(step,:));
-        rateTotR(step) = pkTotR(step) / (Ir(step)/100);
-        tmpFR = RTot(step,:);
-        stanceTimeR(step) = length(tmpFR(tmpFR>0));
+        [pkTotR(stepR), Ir(stepR)]= max(RTot(stepR,:)); totImpulseR(stepR) = sum(RTot(stepR,:));
+        pkHeelR(stepR) = max(RHeel(stepR,:)); heelImpulseR(stepR) = sum(RHeel(stepR,:));
+        pkLatR(stepR) = max(RLat(stepR,:)); latImpulseR(stepR) = sum(RLat(stepR,:));
+        pkMedR(stepR) = max(RMed(stepR,:)); medImpulseR(stepR) = sum(RMed(stepR,:));
+        rateTotR(stepR) = pkTotR(stepR) / (Ir(stepR)/100);
+        tmpFR = RTot(stepR,:);
+        stanceTimeR(stepR) = length(tmpFR(tmpFR>0));    
     end
     
     %concatenate left features and remove 0 rows
@@ -236,10 +239,10 @@ if writeData == 1
     % Convert cell to a table and use first row as variable names
     T = cell2table(outputAllConfigs(2:end,:),'VariableNames',outputAllConfigs(1,:));
     % Write the table to a CSV file
-    writetable(T,'DFtest.csv')
+    writetable(T,'KHNew.csv')
 end
 % 
-% %% make plots 
+%% make plots 
 % figure(3)
 % shadedErrorBar(0:desiredStepLength, LTot, {@mean, @std}, 'lineprops','blue');
 % hold on
