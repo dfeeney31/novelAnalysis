@@ -2,7 +2,7 @@
 clear
 addpath('C:\Users\Daniel.Feeney\Documents\novel_data')
 % The files should be named sub_balance_Config_trialNo - Forces.txt
-input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\DF';% Change to correct filepath
+input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Endurance Protocol Trail Run\Outdoor_Protocol_March2020\SH';% Change to correct filepath
 %input_dir = 'C:\Users\Daniel.Feeney\Dropbox (Boa)\Hike Work Research\OutdoorProtocolMarch2020';% Change to correct filepath
 
 cd(input_dir)
@@ -12,14 +12,14 @@ dataList = sort(dataList);
 [f,~] = listdlg('PromptString','Select data files for all subjects in group','SelectionMode','multiple','ListString',dataList);
 NumbFiles = length(f);
 
-outputAllConfigs = {'Subject','Config','UpDown','PrePost','stanceTime','PkTotal', 'ImpulseTotal', 'PkHeel', 'HeelImpulse',...
+outputAllConfigs = {'Subject','Config','PrePost','UpDown','stanceTime','PkTotal', 'ImpulseTotal', 'PkHeel', 'HeelImpulse',...
     'PkLat','LatImpulse','PkMed','MedImpulse','RateTotal'};
 
 %Define constants and options
-fThresh = 50; %below this value will be set to 0.
+fThresh = 70; %below this value will be set to 0.
 minStepLen = 10; %minimal step length
 writeData = 1; %will write to spreadsheet
-desiredStepLength = 70; %length to look forward for plotting and data gathering 
+desiredStepLength = 20; %length to look forward for plotting and data gathering 
 tFirstImpact = 20; %Calculating loading rate. How far do you look for impact peak? 
 apple = 0;
 
@@ -33,8 +33,9 @@ for s = 1:NumbFiles
 
     else
         dat = importLoadsolAndroid(fileLoc);
-        dat.Properties.VariableNames = {'Time' 'LeftHeel' 'LeftMedial' 'LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right',...
-            'toBePassed', 'pass2','pass3','pass4','pass5'};
+        dat.Properties.VariableNames = {'Time' 'RightLateral' 'RightMedial' 'RightHeel','Right','pass','pass1','pass2','pass3','pass4','toBePassed',...
+            'c12','c13','c14','c15'};
+            
     end
     
     splitFName = strsplit(fileName,'_'); 
@@ -130,11 +131,11 @@ for s = 1:NumbFiles
        rVecTmp(l) = {'r'}; 
     end
    %make vectors of left or right and configuration name to add into file  
-    SNameTmp = cell(length(rVecTmp),1); %Subject name
-    configNameTmp = cell(length(rVecTmp),1); %configuration name from early in the file
-    UpDownTmp = cell(length(rVecTmp),1); %configuration name from early in the file
-    PrePostTmp = cell(length(rVecTmp),1); %configuration name from early in the file
-    for i = 1:length(rVecTmp)
+    SNameTmp = cell(size(rightFeat,1),1); %Subject name
+    configNameTmp = cell(size(rightFeat,1),1); %configuration name from early in the file
+    UpDownTmp = cell(size(rightFeat,1),1); %configuration name from early in the file
+    PrePostTmp = cell(size(rightFeat,1),1); %configuration name from early in the file
+    for i = 1:size(rightFeat,1)
         SNameTmp(i) = {sName};
         configNameTmp(i) = {Config};
         UpDownTmp(i) = {UpDown};
@@ -155,7 +156,7 @@ if writeData == 1
     % Convert cell to a table and use first row as variable names
     T = cell2table(outputAllConfigs(2:end,:),'VariableNames',outputAllConfigs(1,:));
     % Write the table to a CSV file
-    writetable(T,'DFfour.csv')
+    writetable(T,'SH.csv')
 end
 % 
 %% make plots 
