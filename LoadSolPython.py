@@ -20,7 +20,7 @@ apple = 0; #1 for apple 0 otherwise
 # Read in file and add names
 fPath = 'C:/Users/Daniel.Feeney/Dropbox (Boa)/Endurance Protocol Trail Run/Outdoor_Protocol_March2020/KH/'
 entries = os.listdir(fPath)
-fName = entries[2] #temporarily hard coding one file
+fName = entries[1] #temporarily hard coding one file
 
 dat = pd.read_csv(fPath+fName,sep='\t', skiprows = 4, header = 0)
 dat.columns = ['Time', 'LeftHeel', 'LeftMedial','LeftLateral','Left','Time2','RightLateral','RightMedial','RightHeel','Right','pass']
@@ -119,8 +119,8 @@ RForce[RForce<fThresh] = 0
 # delimit steps on left side
 ric = []
 count = 1;
-for step in range(len(LForce)-1):
-    if LForce[step] == 0 and LForce[step + 1] >= fThresh:
+for step in range(len(RForce)-1):
+    if RForce[step] == 0 and RForce[step + 1] >= fThresh:
         ric.append(step)
         count = count + 1
 #left toe off
@@ -132,8 +132,8 @@ for step in range(len(RForce)-1):
         count = count + 1
 
 # Remove 0s from lists
-ric = [s for s in ric if s != 0]
-rto = [s for s in rto if s != 0]
+#ric = [s for s in ric if s != 0]
+#rto = [s for s in rto if s != 0]
 #%%
 # trim first contact/toe off if not a full step
 if ric[0] > rto[0]:
@@ -160,6 +160,7 @@ RStepLens = RStepLens[ RStepLens > minStepLen ]
 #Trim IC and TO for false steps
 ric = np.delete(ric, falseSteps)
 rto = np.delete(rto, falseSteps)
+
 #%%
 ###### extract relevent features ###### 
 RTot = []
@@ -167,12 +168,13 @@ RHeel = []
 RLat = []
 RMed = []
     
-for landing in lic:
+for landing in ric:
     RTot.append(RForce[landing:landing+desiredStepLength])
     RHeel.append(dat.RightHeel[landing:landing+desiredStepLength])
     RLat.append(dat.RightLateral[landing:landing+desiredStepLength])
     RMed.append(dat.RightMedial[landing:landing+desiredStepLength])
 noSteps = len(ric)
+
 ####
 RightMat = np.reshape(RTot, (noSteps,desiredStepLength))
 RHeelMat = np.reshape(RHeel, (noSteps, desiredStepLength))
