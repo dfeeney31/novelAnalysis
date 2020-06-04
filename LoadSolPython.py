@@ -239,7 +239,7 @@ rateTotR = []
  
 for step in range(noSteps):
     #left
-    MaxLR.append(max(RightMat[step,:]))
+    MaxR.append(max(RightMat[step,:]))
     totImpulseR.append(sum(RightMat[step,:]))
     pkHeelR.append(max(RHeelMat[step,:]))
     heelImpulseR.append(sum(RHeelMat[step,:]))
