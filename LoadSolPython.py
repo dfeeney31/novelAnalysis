@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jun  4 09:44:04 2020
-
+Use this file by placing in a directory with txt outputs of Loadsol. It will
+detect landings and takeoffs based on a force threshold, create a 2D matrix for
+each step, plot the results, calcualte the maxes and the impulses
 @author: Daniel.Feeney
 """
 
@@ -193,3 +195,59 @@ ax[0].set_title('Total Right Force')
 ax[1].set_title('Right Heel Force')
 ax[2].set_title('Right Lateral Force')
 ax[3].set_title('Right Medial Force')
+
+#%%
+
+#Left side
+MaxL = []
+totImpulse = []
+pkHeel = []
+heelImpulse = []
+pkLat = []
+latImpulse = []
+pkMed = []
+medImpulse = []
+stanceTime = []
+rateTot = []   
+
+for step in range(noSteps):
+    #left
+    MaxL.append(max(LeftMat[step,:]))
+    totImpulse.append(sum(LeftMat[step,:]))
+    pkHeel.append(max(LHeelMat[step,:]))
+    heelImpulse.append(sum(LHeelMat[step,:]))
+    pkLat.append(max(LLatMat[step,:]))
+    latImpulse.append(sum(LLatMat[step,:]))
+    pkMed.append(max(LMedMat[step,:]))
+    medImpulse.append(sum(LMedMat[step,:]))
+    tmpF = LeftMat[step,:]
+    tmpMaxLoc = np.argmin(tmpF)
+    rateTot.append(max(tmpF) / (tmpMaxLoc/100))
+    stanceTime.append(len(tmpF[tmpF>0]))
+    
+# Right side
+MaxR = []
+totImpulseR = []
+pkHeelR = []
+heelImpulseR = []
+pkLatR = []
+latImpulseR = []
+pkMedR = []
+medImpulseR = []
+stanceTimeR = []
+rateTotR = []  
+ 
+for step in range(noSteps):
+    #left
+    MaxLR.append(max(RightMat[step,:]))
+    totImpulseR.append(sum(RightMat[step,:]))
+    pkHeelR.append(max(RHeelMat[step,:]))
+    heelImpulseR.append(sum(RHeelMat[step,:]))
+    pkLatR.append(max(RLatMat[step,:]))
+    latImpulseR.append(sum(RLatMat[step,:]))
+    pkMedR.append(max(RMedMat[step,:]))
+    medImpulseR.append(sum(RMedMat[step,:]))
+    tmpF = RightMat[step,:]
+    tmpMaxLoc = np.argmin(tmpF)
+    rateTotR.append(max(tmpF) / (tmpMaxLoc/100))
+    stanceTimeR.append(len(tmpF[tmpF>0]))
