@@ -209,6 +209,9 @@ pkMed = []
 medImpulse = []
 stanceTime = []
 rateTot = []   
+nameL = []
+configL = []
+tmpL = []
 
 for step in range(noSteps):
     #left
@@ -221,10 +224,18 @@ for step in range(noSteps):
     pkMed.append(max(LMedMat[step,:]))
     medImpulse.append(sum(LMedMat[step,:]))
     tmpF = LeftMat[step,:]
-    tmpMaxLoc = np.argmin(tmpF)
+    tmpMaxLoc = np.argmax(tmpF)
     rateTot.append(max(tmpF) / (tmpMaxLoc/100))
     stanceTime.append(len(tmpF[tmpF>0]))
+    nameL.append(subName)
+    configL.append(config)
+    tmpL.append('l')
     
+leftDat = pd.DataFrame({'Sub':list(nameL), 'Config': list(configL), 'Side': list(tmpL),'StanceTime': list(stanceTime),
+              'VLR':list(rateTot),'MaxF': list(MaxL),'pkHeel': list(pkHeel), 'HeelImpulse': list(heelImpulse),
+              'PkLat': list(pkLat), 'LatImp': list(latImpulse), 'PkMed': list(pkMed),
+              'MedImp': list(medImpulse)})
+
 # Right side
 MaxR = []
 totImpulseR = []
@@ -236,6 +247,9 @@ pkMedR = []
 medImpulseR = []
 stanceTimeR = []
 rateTotR = []  
+nameR = []
+configR = []
+tmpR = []
  
 for step in range(noSteps):
     #left
@@ -248,6 +262,19 @@ for step in range(noSteps):
     pkMedR.append(max(RMedMat[step,:]))
     medImpulseR.append(sum(RMedMat[step,:]))
     tmpF = RightMat[step,:]
-    tmpMaxLoc = np.argmin(tmpF)
+    tmpMaxLoc = np.argmax(tmpF)
     rateTotR.append(max(tmpF) / (tmpMaxLoc/100))
     stanceTimeR.append(len(tmpF[tmpF>0]))
+    nameR.append(subName)
+    configR.append(config)
+    tmpR.append('R')
+
+rightDat = pd.DataFrame({'Sub':list(nameR), 'Config': list(configR), 'Side': list(tmpR),'StanceTime': list(stanceTimeR),
+              'VLR':list(rateTotR),'MaxF': list(MaxR),'pkHeel': list(pkHeelR), 'HeelImpulse': list(heelImpulseR),
+              'PkLat': list(pkLatR), 'LatImp': list(latImpulseR), 'PkMed': list(pkMedR),
+              'MedImp': list(medImpulseR)})
+    
+rightDat.append(leftDat, ignore_index = True)
+    
+
+
